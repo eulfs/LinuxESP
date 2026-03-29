@@ -6,7 +6,14 @@ project made by eula, open source */
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/uart.h"
-const char *lsres = "ls echo /home\n";
+#include "esp_system.h"
+
+//results in search
+const char *lsres = "ls echo /home\ncat whoami reboot\nclear\n";
+
+/* file infrastructure */
+const char *ls = "/ls";
+/* end of file infrastructure */
 
 void app_main(){
 //uart_set_echo_mode(UART_NUM_0, UART_ECHO_ENABLE);
@@ -33,7 +40,15 @@ printf("\033[H\033[J");
   printf("\033[H\033[J");
   vTaskDelay(pdMS_TO_TICKS(100));
   esp_restart();
-} else{
+} else if(strncmp(wcons, "cat", 3) == 0){
+  char *flst = wcons + 4;
+  if(strcmp(flst, "/home")!=0 && strcmp(flst, "/")!=0){
+    printf("file %s\n", flst);
+  } else{
+    printf("cat: %s: Is a directory\n", flst);
+  }
+}
+ else{
 printf("bash: %s :command not found\n", wcons);
 }
 }
